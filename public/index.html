@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlipIQ — Smart Flashcard Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- ── UPLOAD SCREEN ── -->
+  <div id="screen-upload" class="screen active">
+    <div class="noise"></div>
+    <header class="header">
+      <div class="logo">Flip<span>IQ</span></div>
+      <div class="tagline">PDF → Smart Flashcards, Instantly</div>
+    </header>
+
+    <main class="upload-main">
+      <div class="hero-text">
+        <h1>Turn any PDF<br/>into a <em>mastery deck</em></h1>
+        <p>Drop your notes, textbook chapter, or study material.<br/>We'll build a smart deck powered by spaced repetition.</p>
+      </div>
+
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M24 4L24 32M24 4L14 14M24 4L34 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 36V40C6 42.2 7.8 44 10 44H38C40.2 44 42 42.2 42 40V36" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="upload-label">Drop your PDF here</p>
+        <p class="upload-sub">or click to browse · Max 10MB</p>
+        <input type="file" id="file-input" accept=".pdf" />
+      </div>
+
+      <div class="upload-actions">
+        <button id="btn-generate" class="btn-primary" disabled>
+          <span class="btn-text">Generate Flashcards</span>
+          <span class="btn-loader" style="display:none">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </span>
+        </button>
+        <p class="upload-hint" id="file-name-label">No file selected</p>
+      </div>
+
+      <div class="features">
+        <div class="feat"><span class="feat-icon">🧠</span><span>AI-generated cards by a great teacher, not a scraper</span></div>
+        <div class="feat"><span class="feat-icon">🔁</span><span>SM-2 spaced repetition — study smarter</span></div>
+        <div class="feat"><span class="feat-icon">📊</span><span>Track mastery across your deck in real-time</span></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── STUDY SCREEN ── -->
+  <div id="screen-study" class="screen">
+    <div class="noise"></div>
+
+    <header class="study-header">
+      <button class="btn-back" id="btn-back">← Back</button>
+      <div class="logo small">Flip<span>IQ</span></div>
+      <div class="deck-meta" id="deck-meta">0 cards</div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-track">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat" id="stat-new"><span class="stat-num">0</span><span class="stat-label">New</span></div>
+      <div class="stat" id="stat-learning"><span class="stat-num">0</span><span class="stat-label">Learning</span></div>
+      <div class="stat mastered" id="stat-mastered"><span class="stat-num">0</span><span class="stat-label">Mastered</span></div>
+    </div>
+
+    <!-- Card Area -->
+    <div class="card-area">
+      <div class="card-counter" id="card-counter">1 / 20</div>
+
+      <div class="card-scene" id="card-scene">
+        <div class="card" id="flashcard">
+          <div class="card-face card-front">
+            <div class="card-topic" id="card-topic-front">Topic</div>
+            <div class="card-content" id="card-front-text">Question goes here</div>
+            <div class="card-tap-hint">Tap to reveal</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-topic" id="card-topic-back">Topic</div>
+            <div class="card-content" id="card-back-text">Answer goes here</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Buttons (shown after flip) -->
+      <div class="rating-row" id="rating-row" style="display:none">
+        <button class="btn-rate forgot" onclick="rateCard(0)">
+          <span class="rate-icon">✗</span>
+          <span class="rate-label">Forgot</span>
+        </button>
+        <button class="btn-rate hard" onclick="rateCard(1)">
+          <span class="rate-icon">~</span>
+          <span class="rate-label">Hard</span>
+        </button>
+        <button class="btn-rate good" onclick="rateCard(2)">
+          <span class="rate-icon">✓</span>
+          <span class="rate-label">Good</span>
+        </button>
+        <button class="btn-rate easy" onclick="rateCard(3)">
+          <span class="rate-icon">★</span>
+          <span class="rate-label">Easy</span>
+        </button>
+      </div>
+
+      <div class="flip-hint" id="flip-hint">← Tap card or press Space to flip →</div>
+    </div>
+  </div>
+
+  <!-- ── COMPLETE SCREEN ── -->
+  <div id="screen-complete" class="screen">
+    <div class="noise"></div>
+    <div class="complete-wrap">
+      <div class="complete-icon">🎉</div>
+      <h2>Round Complete!</h2>
+      <p id="complete-summary">You reviewed all cards.</p>
+      <div class="complete-stats" id="complete-stats"></div>
+      <div class="complete-actions">
+        <button class="btn-primary" onclick="restartStudy()">Study Again</button>
+        <button class="btn-secondary" onclick="showScreen('screen-upload')">New Deck</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
